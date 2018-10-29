@@ -1,18 +1,22 @@
 package pl.com.britenet.sqlite;
 
+import pl.com.britenet.enities.Customer;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerRepository {
 
-    public int createCustomer(String name, String surname, Integer age) {
+    public int createCustomer(Customer customer) {
         String sql = "insert into CUSTOMERS(NAME,SURNAME,AGE) values (?,?,?)";
         try {
             Connection connection = Configuration.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, surname);
-            if (age != null) {
-                preparedStatement.setInt(3, age);
+            preparedStatement.setString(1, customer.getName());
+            preparedStatement.setString(2, customer.getSurname());
+            if (customer.getAge() != null) {
+                preparedStatement.setInt(3, customer.getAge());
             } else {
                 preparedStatement.setNull(3, Types.INTEGER);
             }
@@ -34,21 +38,25 @@ public class CustomerRepository {
         return 0;
     }
 
-    public void readAllCustomers() {
+    public List<Customer> readAllCustomers() {
+        List<Customer> resultList = new ArrayList<>();
         try {
             Connection connection = Configuration.getConnection();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select ID,NAME,SURNAME,AGE from CUSTOMERS");
             while (resultSet.next()) {
-                System.out.print(resultSet.getInt("ID"));
-                System.out.print(resultSet.getString("NAME"));
-                System.out.print(resultSet.getString("SURNAME"));
-                System.out.println(resultSet.getInt("AGE"));
+                Customer customer = new Customer();
+                customer.setId(resultSet.getInt("ID"));
+                customer.setName(resultSet.getString("NAME"));
+                customer.setSurname(resultSet.getString("SURNAME"));
+                customer.setAge(resultSet.getInt("AGE"));
+                resultList.add(customer);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             Configuration.closeConnection();
         }
+        return resultList;
     }
 }

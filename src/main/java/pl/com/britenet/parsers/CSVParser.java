@@ -1,5 +1,7 @@
 package pl.com.britenet.parsers;
 
+import pl.com.britenet.enities.Contact;
+import pl.com.britenet.enities.Customer;
 import pl.com.britenet.sqlite.ContactRepository;
 import pl.com.britenet.sqlite.CustomerRepository;
 
@@ -39,9 +41,9 @@ public class CSVParser {
                 age = null;
             }
         }
-        int generatedId = customerRepository.createCustomer(splitLine[0], splitLine[1], age);
+        int generatedId = customerRepository.createCustomer(new Customer(null, splitLine[0], splitLine[1], age));
         for (int i = 4; i < splitLine.length; i++) {
-            contactRepository.createContact(generatedId, detectContactType(splitLine[i]), splitLine[i]);
+            contactRepository.createContact(new Contact(null, generatedId, detectContactType(splitLine[i]), splitLine[i]));
         }
     }
 
