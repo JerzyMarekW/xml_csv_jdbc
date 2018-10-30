@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class CSVParser {
+public class CSVParser implements Parser{
 
     private CustomerRepository customerRepository = new CustomerRepository();
     private ContactRepository contactRepository = new ContactRepository();

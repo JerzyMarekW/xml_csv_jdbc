@@ -1,31 +1,82 @@
 package pl.com.britenet.parsers;
 
+import pl.com.britenet.enities.Contact;
+import pl.com.britenet.enities.Customer;
 import pl.com.britenet.sqlite.ContactRepository;
 import pl.com.britenet.sqlite.CustomerRepository;
 
-import java.io.BufferedReader;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
-public class XMLParser {
+public class XMLParser implements Parser{
 
     private CustomerRepository customerRepository = new CustomerRepository();
     private ContactRepository contactRepository = new ContactRepository();
 
     public void parseFile(String filePath) {
-        String currentLine, currentUTFLine;
+        Customer customer = new Customer();
+        Contact contact;
+        boolean isContact = false;
+        Integer customerId = null;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            while ((currentLine = reader.readLine()) != null) {
-                currentUTFLine = new String(currentLine.getBytes(), StandardCharsets.UTF_8);
-
+            XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new FileInputStream(filePath));
+            while (xmlEventReader.hasNext()) {
+                XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                if (xmlEvent.isStartElement()) {
+                    StartElement startElement = xmlEvent.asStartElement();
+                    if ("person".equals(startElement.getName().getLocalPart())) {
+                        customer = new Customer();
+                        isContact = false;
+                    } else if ("name".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        customer.setName(xmlEvent.asCharacters().getData());
+                    } else if ("surname".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        customer.setSurname(xmlEvent.asCharacters().getData());
+                    } else if ("age".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        customer.setAge(Integer.parseInt(xmlEvent.asCharacters().getData()));
+                    } else if ("contacts".equals(startElement.getName().getLocalPart())) {
+                        customerId = customerRepository.createCustomer(customer);
+                        isContact = true;
+                    } else if ("email".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        contact = new Contact();
+                        contact.setIdCustomer(customerId);
+                        contact.setType(1);
+                        contact.setContact(xmlEvent.asCharacters().getData());
+                        contactRepository.createContact(contact);
+                    } else if ("phone".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        contact = new Contact();
+                        contact.setIdCustomer(customerId);
+                        contact.setType(2);
+                        contact.setContact(xmlEvent.asCharacters().getData());
+                        contactRepository.createContact(contact);
+                    } else if ("jabber".equals(startElement.getName().getLocalPart())) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        contact = new Contact();
+                        contact.setIdCustomer(customerId);
+                        contact.setType(3);
+                        contact.setContact(xmlEvent.asCharacters().getData());
+                        contactRepository.createContact(contact);
+                    } else if (isContact) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        contact = new Contact();
+                        contact.setIdCustomer(customerId);
+                        contact.setType(0);
+                        contact.setContact(xmlEvent.asCharacters().getData());
+                        contactRepository.createContact(contact);
+                    }
+                }
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("Could not open file: " + filePath + "!");
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (FileNotFoundException | XMLStreamException e) {
             e.printStackTrace();
         }
     }
