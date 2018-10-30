@@ -27,8 +27,6 @@ public class CustomerRepository {
                         return generatedKeys.getInt(1);
                     }
                 }
-            } else {
-                return 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -49,7 +47,7 @@ public class CustomerRepository {
                 customer.setId(resultSet.getInt("ID"));
                 customer.setName(resultSet.getString("NAME"));
                 customer.setSurname(resultSet.getString("SURNAME"));
-                customer.setAge(resultSet.getInt("AGE"));
+                customer.setAge((Integer) resultSet.getObject("AGE"));
                 resultList.add(customer);
             }
         } catch (SQLException e) {

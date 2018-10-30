@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ContactRepository {
 
-    public void createContact(Contact contact) {
+    public int createContact(Contact contact) {
         String sql = "insert into CONTACTS(ID_CUSTOMER,TYPE,CONTACT) values (?,?,?)";
         try {
             PreparedStatement preparedStatement = Configuration.getConnection().prepareStatement(sql);
@@ -16,11 +16,20 @@ public class ContactRepository {
             preparedStatement.setInt(2, contact.getType());
             preparedStatement.setString(3, contact.getContact());
             preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             Configuration.closeConnection();
         }
+        return 0;
     }
 
     public List<Contact> readAllContacts() {

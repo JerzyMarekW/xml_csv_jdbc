@@ -67,9 +67,9 @@ public class Configuration {
     private static void createContactsTable() throws SQLException {
         String sql = "create table if not exists CONTACTS (\n" +
                 "ID integer primary key autoincrement,\n" +
-                "ID_CUSTOMER integer,\n" +
-                "TYPE integer,\n" +
-                "CONTACT varchar(255),\n" +
+                "ID_CUSTOMER integer not null,\n" +
+                "TYPE integer not null,\n" +
+                "CONTACT varchar(255) not null,\n" +
                 "foreign key(ID_CUSTOMER) references CUSTOMERS(ID)\n" +
                 ");";
         connection.createStatement().execute(sql);

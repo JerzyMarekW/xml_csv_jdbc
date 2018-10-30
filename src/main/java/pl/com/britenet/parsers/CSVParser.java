@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class CSVParser implements Parser{
+public class CSVParser implements Parser {
 
     private CustomerRepository customerRepository = new CustomerRepository();
     private ContactRepository contactRepository = new ContactRepository();
@@ -48,10 +48,14 @@ public class CSVParser implements Parser{
     }
 
     private int detectContactType(String contact) {
+        //TODO
+        // nie da się odróżnić typu jabber od zwykłego username
         if (contact.contains("@jabber")) {
             return 3;
         }
-        if (contact.matches("(\\d+[\\-\\s]?)+\\d+")) {
+        //TODO
+        // nie da się odróżnić numeru telefonu od mp. numeru icq
+        if (contact.matches("(\\d+[\\s]?)*\\d+")) {
             return 2;
         }
         if (contact.contains("@")) {
