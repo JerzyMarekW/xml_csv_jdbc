@@ -15,7 +15,6 @@ public class ContactRepository {
             preparedStatement.setInt(1, contact.getIdCustomer());
             preparedStatement.setInt(2, contact.getType());
             preparedStatement.setString(3, contact.getContact());
-            preparedStatement.executeUpdate();
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {

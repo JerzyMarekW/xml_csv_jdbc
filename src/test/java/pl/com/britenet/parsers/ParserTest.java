@@ -19,12 +19,12 @@ public class ParserTest {
 
     @Before
     public void prepareDatabase() {
-        String databasePath = "src\\test\\test_resources\\sqlite_file";
-        File databaseFile = new File(databasePath);
+        String databaseFilePath = "src\\test\\test_resources\\sqlite_file";
+        File databaseFile = new File(databaseFilePath);
         if (databaseFile.exists()) {
             databaseFile.delete();
         }
-        Configuration.connectToDatabase(databasePath);
+        Configuration.connectToDatabase(databaseFilePath);
         Configuration.createTables();
         Configuration.closeConnection();
     }
